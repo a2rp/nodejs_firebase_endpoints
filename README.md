@@ -1,26 +1,63 @@
-# nodejs_firebase_endpoints
+# Node.js Firebase Endpoints
 
-read all
-![Screenshot (48)](https://user-images.githubusercontent.com/5670738/171721403-2828b748-1993-4d90-97e5-bf86d72fbef9.png)
+A small Express API that demonstrates Firebase Admin SDK setup and basic Cloud Firestore CRUD operations.
 
-read id
-![Screenshot (49)](https://user-images.githubusercontent.com/5670738/171722102-322c2bf1-0cd7-4422-81b6-80e642cdb562.png)
+## Requirements
 
-create
-![Screenshot (51)](https://user-images.githubusercontent.com/5670738/171723008-2ea39000-9ab6-4b23-9109-ca8419e6d864.png)
-![Screenshot (52)](https://user-images.githubusercontent.com/5670738/171723044-5dce217a-3fd9-401f-a15b-97ff9aeb20f2.png)
+- Node.js 22 or newer
+- A Firebase project with Cloud Firestore enabled
+- Google Application Default Credentials for that project
 
-read all
-![Screenshot (53)](https://user-images.githubusercontent.com/5670738/171723162-45add286-89f4-4fa6-adf8-5c6afae75b56.png)
+## Configure credentials
 
-update
-![Screenshot (54)](https://user-images.githubusercontent.com/5670738/171723667-556657fb-eba3-4dba-8794-099e1e4418a0.png)
-![Screenshot (56)](https://user-images.githubusercontent.com/5670738/171723691-f19cdea2-a66c-4fd3-9e16-c8fe1a75d59e.png)
-![Screenshot (57)](https://user-images.githubusercontent.com/5670738/171723713-b2058ca1-b6ca-46f2-bb26-45bf992e0612.png)
+The Firebase Admin SDK uses Application Default Credentials. For local development, create a **new** service-account key in Firebase Console, save it outside the repository, and set `GOOGLE_APPLICATION_CREDENTIALS` to its full path. Never commit a service-account JSON file.
 
-delete
-![Screenshot (58)](https://user-images.githubusercontent.com/5670738/171724169-9bd60339-23f4-4b1c-8e80-81540e514383.png)
-![Screenshot (59)](https://user-images.githubusercontent.com/5670738/171724212-0e645101-8341-4caf-a455-e838af2fe421.png)
-![Screenshot (60)](https://user-images.githubusercontent.com/5670738/171724234-5cd291ec-7cc1-4c91-9d25-4148f74d14ea.png)
+For example, in PowerShell:
 
+```powershell
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\secure\firebase-service-account.json"
+$env:GOOGLE_CLOUD_PROJECT = "your-firebase-project-id"
+```
 
+Google Cloud environments can use their attached service identity instead of a downloaded key.
+
+> **Security:** This is an unauthenticated admin CRUD demo. The Admin SDK bypasses Firestore Security Rules. Keep it on localhost with test data; add authentication, authorization, and request protections before exposing it to other users. A service-account key was present in an earlier public revision of this repository. Revoke that old key in Google Cloud IAM and create a replacement; deleting the file from the latest revision does not remove it from Git history.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+The server listens on `127.0.0.1:8080` by default. Set `PORT` or `HOST` to override these values. `npm start` runs the server without the development watcher.
+
+## Endpoints
+
+All request and response bodies use JSON. Requests with bodies are limited to 16 KB.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/` | Check that the API is running |
+| `POST` | `/create` | Create a user with `email`, `first_name`, and `last_name` |
+| `GET` | `/read/all` | Read up to 100 users |
+| `GET` | `/read/:id` | Read a user by Firestore document ID |
+| `POST` | `/update` | Update a user using `id` and one or more user fields |
+| `DELETE` | `/delete/:id` | Delete a user by Firestore document ID |
+
+Example create request:
+
+```http
+POST http://127.0.0.1:8080/create
+Content-Type: application/json
+
+{
+  "email": "person@example.com",
+  "first_name": "Asha",
+  "last_name": "Kumar"
+}
+```
+
+## Configuration
+
+Copy `.env.example` to `.env` and set local values. `.env` and service-account JSON files are ignored by Git. For production, provide configuration through the hosting environment's secret manager.
